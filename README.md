@@ -34,5 +34,5 @@ Aug. 30, 2019
 * [Green Box: Casio VZ-1, VZ-10M, VZ-8M, Hohner HS-2/E](https://www.amazona.de/green-box-casio-vz-1-vz-10m-vz-8m-hohner-hs-2-e/)
 
 ##### 3. Sound Examples
-* [RetroSond: CASIO VZ-1 iPD Synthesizer "VeeZeeOne"](https://www.youtube.com/watch?v=mWFKpTlMaYM)
+* [RetroSound: CASIO VZ-1 iPD Synthesizer "VeeZeeOne"](https://www.youtube.com/watch?v=mWFKpTlMaYM)
 * [RetroSound: CASIO VZ-1 iPD Synthesizer (1987)](https://www.youtube.com/watch?v=LVG_FVgP7yU)
