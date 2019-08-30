@@ -12,7 +12,7 @@ In this project I try to rebuild the vintage Casio VZ-1/VZ-10M music synthesizer
 
 I always strongly disliked the unpleasant - though most characteristic - aliasing and analog noise of the VZ-1. Hence, I will not attempt to reproduce this. Insofar, the remake is not intended to be perfect.
 
-As a secondary goal I may want to reproduce the GUI of the original instrumenent which would be nice to have, but not necessarily of much practical use.
+As a secondary goal I may want to reproduce the GUI of the original instrument. This would be a nice-to-have, however not necessarily of much practical use.
 
 ### Collaborators Welcome!
 As this is a mere hobby project, I cannot tell how far I will come with it. At any rate, progress is going to be slow.
