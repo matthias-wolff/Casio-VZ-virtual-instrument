@@ -3,7 +3,7 @@ A virtual replica of the Casio VZ-1/VZ-10M music synthesizer
 
 ### Project Outline
 In this project I try to rebuild the vintage Casio VZ-1/VZ-10M music synthesizer in [Reaktor 6](https://www.native-instruments.com/en/products/komplete/synths/reaktor-6). The primary goal is a fully functional player which is compatible with MIDI editor/librarian software like [Midi Quest](https://squest.com/Products/MidiQuest12/index.html) or the like. My workplan is
-1. Make some debugging and development tools (sound validator, envelope validator, etc.)
+1. Make some debugging and development tools (waveform validator, envelope validator, etc.)
 2. Reproduce the 8 core waveforms of VZ-1/VZ-10M (1x sine, 5x sawtooth-like waveforms created by Casio's Phase Distortion Modulation, 1x white noise, 1x pitch-sensitive narrow-band noise)
 3. Implement the core sound engine (wavetable oscillators, phase and ring modulators, VCAs, oscillator circuits)
 4. Implement control signal generators (amplitude envelope, key following, layering, parametric sensitivity characterisitcs, etc.)
