@@ -1,0 +1,119 @@
+%% == Casio VZ Virtual Instrument =============================================
+%%    A virtual replica of the Casio VZ-1/VZ-10M music synthesizer
+%% 
+%% Matthias Wolff, BTU Cottbus-Sentenberg
+%% August 30, 2019
+%% DOI 
+%%
+%% References:
+%% [1] 
+%%
+\documentclass[a4paper]{article}
+%
+% Packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{xspace}
+\usepackage{authblk}
+\usepackage[capitalize]{cleveref}
+\usepackage{url}
+\usepackage{tikz}
+%
+% Names
+%\newcommand{\Ntikz}{TikZ\xspace}
+%
+% Custom commands
+\newcommand\e{\mathrm{e}}
+\renewcommand\i{\mathrm{i}}
+\newcommand{\TT}[1]{\protect\scalebox{0.75}[1.04]{\texttt{#1}}}
+\newcommand{\CORR}[1]{{\color{red!90!RoyalBlue}#1}}
+\newcommand{\workOn}{\color{Salmon!80!black}}
+\newcommand{\workOff}{\color{black}}
+\newcommand{\TODO}[1]{%
+  \fboxsep=1pt\fboxrule=1pt\fcolorbox{yellow}{white}{[\textbf{TODO:~}#1]}%
+}
+\newcommand{\CHECK}[1]{%
+  \fboxsep=1pt\fboxrule=1pt\fcolorbox{yellow}{white}{#1}%
+}
+%
+% Settings
+% - Page layout
+\renewcommand{\floatpagefraction}{.8}
+\textheight242mm
+\textwidth150mm
+\marginparwidth28mm
+\topmargin-15mm
+\oddsidemargin0mm
+\evensidemargin0mm
+% - Other
+\setcounter{secnumdepth}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+%
+\author{Matthias Wolff$^{\text{\sf\,[0000--0002--3895--7313]}}$}
+\affil{BTU Cottbus-Senftenberg}
+\title{Casio VZ Virtual Instrument:\\
+A replica of the Casio VZ-1/VZ-10M music synthesizer}
+\maketitle
+
+\bigskip\noindent
+See \TT{https://github.com/matthias-wolff/Casio-VZ-virtual-instrument/blob/master/Casio-VZ-virtual-instrument.pdf}
+for the latest version of this document.
+\begin{center}
+  \bigskip\bigskip
+  \begin{minipage}{0.9\linewidth}
+    \textbf{Abstract}
+
+    \bigskip
+    \TODO{\ldots}.
+
+  \end{minipage}
+  \vfill
+  \vfill
+\end{center}
+\clearpage
+
+\tableofcontents
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Goals and Prerequisites}
+\TODO{\ldots}
+
+\subsection{The VZ-1/VZ-10M Music Synthesizer}
+\TODO{\ldots}
+
+\subsection{The Reaktor 6 Modular DSP Lab}
+\TODO{\ldots}
+\cite{Reaktor6}
+
+\subsection{Midi Quest 12}
+\TODO{\ldots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Development and Debugging Tools}
+\subsection{Waveform Validator}
+\TODO{\ldots}
+
+\subsection{Envelope Validator}
+\TODO{\ldots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Development and Debugging Tools}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagebreak
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{plain}
+\bibliography{Casio-VZ-virtual-instrument}
+
+\end{document}
+
+%% EOF
