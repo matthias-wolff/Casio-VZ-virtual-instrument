@@ -10,7 +10,7 @@ In this project I try to rebuild the vintage Casio VZ-1/VZ-10M music synthesizer
 5. Implement MIDI SysEx control capability
 6. Reproduce the factory voice and operation libraries
 
-I always strongly disliked the unpleasant - though most characteristic - aliasing and analog noise of the VZ-1. Hence, I am not going to reproduce this.
+I always strongly disliked the unpleasant - though most characteristic - aliasing and analog noise of the VZ-1. Hence, I will not attempt to reproduce this. Insofar, the remake is not intended to be perfect.
 
 As a secondary goal I may want to reproduce the GUI of the original instrumenent which would be nice to have, but not necessarily of much practical use.
 
