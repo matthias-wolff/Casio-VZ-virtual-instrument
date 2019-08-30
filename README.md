@@ -26,6 +26,7 @@ Aug. 30, 2019
 ##### 1. Related Projects
 * [VZone](https://www.youtube.com/watch?v=PaXGQDl-uco) - NI Kontakt instrument based on 24 sounds of the VZ-1
 * [VirtualCZ](https://www.amazona.de/test-plugin-boutique-virtualcz-phase-distortion-synthesizer/) - virtual remake of the Casio CZ-1 (predecessor of the VZ-1)
+* [Casio CZ for iOS](https://www.amazona.de/test-casio-cz-virtueller-phase-distortion-synth-ios/) - another virtual remake of the CZ-1 by Casio itself
 
 ##### 2. Information on the VZ-1/VZ-10M Synthesizers
 * [Green Box: Casio VZ-1, VZ-10M, VZ-8M, Hohner HS-2/E](https://www.amazona.de/green-box-casio-vz-1-vz-10m-vz-8m-hohner-hs-2-e/)
