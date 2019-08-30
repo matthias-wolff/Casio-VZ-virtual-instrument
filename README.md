@@ -35,3 +35,4 @@ Aug. 30, 2019
 
 ##### 3. Sound Examples
 * [RetroSond: CASIO VZ-1 iPD Synthesizer "VeeZeeOne"](https://www.youtube.com/watch?v=mWFKpTlMaYM)
+* [RetroSound: CASIO VZ-1 iPD Synthesizer (1987)](https://www.youtube.com/watch?v=LVG_FVgP7yU)
