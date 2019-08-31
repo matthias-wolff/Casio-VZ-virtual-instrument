@@ -32,6 +32,7 @@ Aug. 30, 2019
 
 ##### 2. Information on the VZ-1/VZ-10M Synthesizers
 * [Green Box: Casio VZ-1, VZ-10M, VZ-8M, Hohner HS-2/E](https://www.amazona.de/green-box-casio-vz-1-vz-10m-vz-8m-hohner-hs-2-e/)
+* [Workshop: Casio CZ/VZ und die Grundlagen der Phase Distortion Synthesis](https://www.amazona.de/workshop-casio-czvz-und-die-grundlagen-der-phase-distortion-synthesis/)
 
 ##### 3. Sound Examples
 * [RetroSound: CASIO VZ-1 iPD Synthesizer "VeeZeeOne"](https://www.youtube.com/watch?v=mWFKpTlMaYM)
