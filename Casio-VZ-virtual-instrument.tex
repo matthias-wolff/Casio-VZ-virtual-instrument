@@ -400,10 +400,13 @@ sections
   = 180-\arctan(a)+\arctan(b)
   = 180-\arctan(a)+\arctan\!\left(\frac{a}{2a-1}\right)
 \end{equation}
-measured in degrees (see \cref{fig:PDMcc2}). The permissible range is
-$135^\circ\leq\vartheta\leq 180^\circ$ \cite{Ger09}. As I did not manage to
-solve \cref{eqn:PDMaToTheta} for $a$, I just plot the function and print a
-lookup table in \cref{fig:PDMaToTheta}.
+measured in degrees (see \cref{fig:PDMcc2}). Literature states that the
+permissible range is $135^\circ\leq\vartheta\leq 180^\circ$ \cite{Ger09}.
+However, for the wavetable of the VZ series this restriction does not seem to
+hold. Measurement yielded angles down to $123^\circ$ corresponding to slope
+parameters $a>10$ (see \TT{matlab/PDMwaves.mlx}). As I did not manage to solve
+\cref{eqn:PDMaToTheta} for $a$, I just plot the function and print a lookup
+table in \cref{fig:PDMaToTheta}.
 %
 \begin{figure*}
   \centering
