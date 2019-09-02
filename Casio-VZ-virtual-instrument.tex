@@ -80,7 +80,35 @@ for the latest version of this document.
     \textbf{Abstract}
 
     \bigskip
-    \TODO{\ldots}.
+In this project I try to rebuild the vintage Casio VZ-1/VZ-10M music synthesizer
+in Reaktor 6 \cite{Reaktor6}. The primary goal is a fully functional player
+which is compatible with MIDI editor/librarian software like Midi Quest
+\cite{MidiQuest12} or the like. My workplan is
+\begin{enumerate}   
+  \item 
+    make some debugging and development tools (waveform validator, envelope
+    validator, etc.),
+  \item
+    reproduce the 8 core waveforms of VZ-1/VZ-10M (1x sine, 5x sawtooth-like
+    waveforms created by Casio's Phase Distortion Modulation, 1x white noise, 1x
+    pitch-sensitive narrow-band noise),
+  \item
+    implement the core sound engine (wavetable oscillators, phase and ring
+    modulators, VCAs, oscillator circuits),
+  \item
+    implement control signal generators (amplitude envelope, key following,
+    layering, parametric sensitivity characterisitcs, etc.),
+  \item
+    implement MIDI SysEx control capability, and
+  \item
+    reproduce the factory voice and operation libraries.
+\end{enumerate}
+I always strongly disliked the unpleasant---though most
+characteristic---aliasing and analog noise of the VZ-1. Hence, I will not
+attempt to reproduce this. Insofar, the remake is not intended to be perfect.
+
+As a secondary goal I may want to reproduce the GUI of the original instrument.
+This would be a nice-to-have, however not necessarily of much practical use.
 
   \end{minipage}
   \vfill
@@ -175,7 +203,7 @@ frequency, and $\varphi_0$ denotes a phase offset.
 \REMARK{Throughout this report I will assume continuous time signals $x(t)$
 which, unless stated otherwise, take real values in $-1\leq x(t)\leq 1$, even
 though we actually talk about digital signals of course. However, this
-simplification saves notational trouble.}
+simplification saves some notational trouble.}
 
 \cref{fig:Mt3Sines} shows an example of another basic tone composed by the
 mixture of three sine tones. The timbre of a musical tone can be described
@@ -288,7 +316,7 @@ It is based on the characteristic curve shown in \cref{fig:PDMcc}
       \node[anchor=south east] at({\xx/2},0.25) {$f_1=a\varphi$\!\!\!\!};
       \node[anchor=south east] at({\xx+(1-\xx)/2},0.75) {$f_2=b\varphi+c$\!\!\!\!};
       %
-      \draw[thin,dotted] ({\xx},0.5) -- ({\xx}  ,-0.05) node[below] {$\varphi_0$};
+      \draw[thin,dotted] ({\xx},0.5) -- ({\xx}  ,-0.05) node[below] {$\varphi_B$};
       \draw[thin,dotted] (1    ,1  ) -- ( 1     ,-0.05) node[below] {$2\pi$};
       \draw[thin,dotted] ({\xx},0.5) -- (-0.05  , 0.5 ) node[left] {$\pi$};
       \draw[thin,dotted] (1    ,1  ) -- (-0.05  , 1   ) node[left] {$2\pi$};
@@ -326,22 +354,22 @@ It is based on the characteristic curve shown in \cref{fig:PDMcc}
 We see that the curve consists of two straight sections
 \begin{alignat}{5}
   f_1(\varphi) &= a\varphi, 
-  & \quad 0&\leq\varphi <\varphi_0, 
-  & \quad\text{connecting } (0,0) &\text{ and } (\varphi_0,\pi),
+  & \quad 0&\leq\varphi <\varphi_B, 
+  && \quad\text{connecting points } (0,0) \text{ and } (\varphi_B,\pi),\text{ and}
 \\
   f_2(\varphi) &= b\varphi+c, 
-  & \quad \varphi_0&\leq\varphi \leq 2\pi, 
-  & \quad\text{connecting } (\varphi_0,\pi) &\text{ and } (2\pi,2\pi).
+  & \quad \varphi_B&\leq\varphi \leq 2\pi, 
+  && \quad\text{connecting points } (\varphi_B,\pi) \text{ and } (2\pi,2\pi).
 \end{alignat}
 The slope $a$ of the first section is variable and can take real values $\geq
 1$. The start and end points of the sections define the following constraints
 \begin{alignat}{3}
   \label{eqn:PDMccc1}
-  f_1(\varphi_0) &= a\varphi_0 = \pi
-  && \quad\leadsto \varphi_0 = \frac{\pi}{a}
+  f_1(\varphi_B) &= a\varphi_B = \pi
+  && \quad\leadsto \varphi_B = \frac{\pi}{a}
 \\
   \label{eqn:PDMccc2}
-  f_2(\varphi_0) &= \frac{\pi}{a}b + c = \pi
+  f_2(\varphi_B) &= \frac{\pi}{a}b + c = \pi
 \\
   \label{eqn:PDMccc3}
   f_2(2\pi) &= 2\pi b + c = 2\pi
