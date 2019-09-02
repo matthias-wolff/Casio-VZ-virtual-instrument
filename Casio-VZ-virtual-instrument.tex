@@ -30,15 +30,17 @@
 \renewcommand\i{\mathrm{i}}
 \newcommand\person[1]{\textsc{#1}}
 \newcommand{\TT}[1]{\protect\scalebox{0.75}[1.04]{\texttt{#1}}}
-\newcommand\REMARK[1]{\vspace*{3pt}{%
+\newcommand\WBOX[1]{\vspace*{3pt}{%
   \setlength{\fboxrule}{0.5pt}%
   \setlength{\fboxsep}{3pt}
   
   \noindent\fbox{\begin{minipage}{0.985\textwidth}
-  \textbf{Remark:} #1
+  #1
   \end{minipage}}}\vspace*{3pt}
   
 }
+\newcommand\REMARK[1]{\WBOX{\textbf{Remark: }#1}}
+\newcommand\ISSUE[1]{\WBOX{\textbf{Issue: }#1}}
 \newcommand{\CORR}[1]{{\color{red!90!RoyalBlue}#1}}
 \newcommand{\workOn}{\color{Salmon!80!black}}
 \newcommand{\workOff}{\color{black}}
@@ -294,10 +296,13 @@ for $f_0$, we obtain a formula for converting pitch to frequency:
   \end{scope}
 }}
 % <--
-Phase distortion modulation was invented in the early 1980's by \person{I.
-Tomita}, \person{Y. Takahashi} and collegues of Casio Computer Ltd \cite{Ger09}.
-It is based on the characteristic curve shown in \cref{fig:PDMcc}
-\cite[p.\,20--21]{CZ1manual}.
+Phase distortion modulation (PDM) was invented in the early 1980's by \person{I.
+Tomita}, \person{Y. Takahashi} and collegues of Casio Computer Ltd. for the CZ
+music synthesizer series \cite{Ger09}. \cref{fig:PDMCzExample} shows an example
+from the CZ manual. The VZ series uses wavetables basing on PDM.
+
+Core element of PDM is a phase distortion characteristic curve as shown in
+\cref{fig:PDMcc} \cite[p.\,20--21]{CZ1manual}.
 %
 \begin{figure*}[h!]
   \centering
@@ -441,9 +446,6 @@ table in \cref{fig:PDMaToTheta}.
   parameter $a$, see \cref{eqn:PDMaToTheta}\label{fig:PDMaToTheta}}
 \end{figure*}
 
-Phase distortion modulation was applied in the Casio CZ synthesizer series.
-\cref{fig:PDMCzExample} shows an example from the CZ manual. The VZ series uses
-wavetables basing on PDM.
 \begin{figure*}
   \centering
   \begin{subfigure}{0.3\textwidth}
@@ -547,13 +549,28 @@ wavetables basing on PDM.
     \caption{$\vartheta=135^\circ$ ($a\approx 3.73$)\newline resembling a sawtooth signal}
   \end{subfigure}
   \caption{Example of phase distortion modulation of the function
-    $\sin\!\big(\varphi-\frac{\pi}{2}\big)$ adapted from 
-    \cite[p.\,20--21, Figs.\,1--3]{CZ1manual}\label{fig:PDMCzExample}}
+    $\sin\!\big(\varphi-\frac{\pi}{2}\big)$ adapted from \cite[p.\,20--21,
+    Figs.\,1--3]{CZ1manual}\label{fig:PDMCzExample}. Phase angles $\varphi<0$
+    and $\varphi\geq 2\pi$ are wrapped into the base interval
+    $0\leq\varphi<2\pi.$}
 \end{figure*}
+Six out of eight VZ-1 wavetable samples are phase-shifted and phase-distorted 
+sine waves:
+\begin{equation}
+  x(\varphi) = \sin\!\left(\varphi_{\text{PD}}(\varphi)-\frac{\pi}{2}\right)\!.
+\end{equation} 
+\cref{fig:PDMCzExample} shows some examples.
 
-\REMARK{An alternate phase distortion characteristics $f(x)$ with
-domain $0\leq x\leq 1$ taking values $0\leq f(x)\leq 1$ may be needed for
-Reaktor implementation:
+\ISSUE{Actually, VZ-1 seems to produce the inverted waveforms:
+\begin{equation}
+  x_{\text{VZ-1}}(\varphi) 
+  = -\sin\!\left(\varphi_{\text{PD}}(\varphi)-\frac{\pi}{2}\right)
+  = \sin\!\left(\varphi_{\text{PD}}(\varphi)+\frac{\pi}{2}\right)\!.
+\end{equation}
+}
+\REMARK{An alternate phase distortion characteristic $f(x)$ with domain $0\leq
+x < 1$ taking values $0\leq f(x) < 1$ may be needed for Reaktor
+implementation:
 \begin{equation}
   f(x) = 
   \begin{cases}
@@ -606,6 +623,38 @@ noise (\TT{NOISE1}), and narrow-band noise (\TT{NOISE2}).
 
 \subsection{Replica}
 \subsubsection{Voltage-Controlled Oscillators (VCO)}
+\workOn
+In order to read the wavetable out of my VZ-1, I proceeded as follows
+\begin{enumerate}
+  \item
+    Initialize a new voice,
+  \item
+    Mute all oscillator modules except \TT{M1} and configure line \TT{A} as 
+    \TT{MIX} in \TT{MENU 1/00},
+  \item 
+    In \TT{MENU 1/02}, set \TT{M1} to a fix pitch of \TODO{\TT{OCT=??},
+    \TT{NOTE=??}, \TT{FINE=??}} to generate tones with a frequency of
+    $46^7\!/_8$\,Hz (see below),
+  \item
+    Configure all amplitude controls of \TT{M1} for maximum signal output and
+    set a trivial amplitude envelope mimicking a mere gate signal,
+  \item
+    Disable all LFOs and MIDI controllers on \TT{M1}.
+\end{enumerate} 
+I recorded with the Komplete Audio 6 sound interface at a sampling frequency
+of $f_S=48$\,kHz. Each waveform in the wavetable shall contain $K=1024$ samples
+for one full cycle. Hence, the ``natural'' frequency of the waveforms---i.e., 
+when reading out at $48$\,kSamples per second---is
+\begin{equation}
+  f_0 
+  = \frac{f_A}{K} 
+  = \frac{48000\,\text{Hz}}{1024}
+  = 46^7\!/_8\,\text{Hz}
+\end{equation}
+which corresponds to the musical note F\#1 + $23$\,ct. Using the fix pitch
+settings above, one cycle of the waveform being recorded is exactly $1024$
+samples long and no resampling is necessary.
+\workOff
 
 \subsubsection{Voltage-Controlled Amplifiers (VCA)}
 
@@ -616,6 +665,8 @@ noise (\TT{NOISE1}), and narrow-band noise (\TT{NOISE2}).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{MIDI SysEx Control}
+\ISSUE{Reaktor 6 does not seem to support MIDI SysEx. Circumvent by control
+automation?}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
