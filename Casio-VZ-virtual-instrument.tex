@@ -306,44 +306,46 @@ Core element of PDM is a phase distortion characteristic curve as shown in
 %
 \begin{figure*}[h!]
   \centering
-  \begin{subfigure}[t]{0.45\textwidth}
-    \centering
-    \begin{tikzpicture}[x=3cm, y=3cm]
+  \begin{subfigure}[t]{0.3\textwidth}
+    %\centering
+    \hspace*{-28pt}
+    \begin{tikzpicture}[x=2.5cm, y=2.5cm]
       \def\a{2}; % a_min = 1; a_max = 2+sqrt(3) = 3.7321
       \def\xx{1/(2*\a)};
       %
-      \draw[thin,->] (-0.2,0) -- (1.3,0) node[anchor=north west] {$\varphi$};
-      \draw[thin,->] (0,-0.2) -- (0,1.3) node[anchor=east] {$\varphi_{\text{PD}}(\varphi)$};
+      \draw[thin,->] (-0.2,0) -- (1.2,0) node[anchor=north west] {$\varphi$};
+      \draw[thin,->] (0,-0.2) -- (0,1.2) node[anchor=east] {$\varphi_{\text{PD}}(\varphi)$};
       \node[anchor=north east] at (0,0) {$0$};
       %
       \draw[very thin,dashed] (0,0) -- (1,1);
       \PDMcharact{0}{0}{\a};
       \node[anchor=south east] at({\xx/2},0.25) {$f_1=a\varphi$\!\!\!\!};
-      \node[anchor=south east] at({\xx+(1-\xx)/2},0.75) {$f_2=b\varphi+c$\!\!\!\!};
+      \node[anchor=south east] at({\xx+(1-\xx)/2},0.75) {$f_2=b\varphi\!+\!c$\!\!\!\!};
       %
       \draw[thin,dotted] ({\xx},0.5) -- ({\xx}  ,-0.05) node[below] {$\varphi_B$};
       \draw[thin,dotted] (1    ,1  ) -- ( 1     ,-0.05) node[below] {$2\pi$};
       \draw[thin,dotted] ({\xx},0.5) -- (-0.05  , 0.5 ) node[left] {$\pi$};
       \draw[thin,dotted] (1    ,1  ) -- (-0.05  , 1   ) node[left] {$2\pi$};
     \end{tikzpicture}
-    \caption{Piecewise linear phase charateristics\label{fig:PDMcc}}
+    \caption{Piecewise linear phase\newline charateristics\label{fig:PDMcc}}
   \end{subfigure}
-  \begin{subfigure}[t]{0.45\textwidth}
-    \centering
-    \begin{tikzpicture}[x=3cm, y=3cm]
+  \begin{subfigure}[t]{0.3\textwidth}
+    %\centering
+    \hspace*{-28pt}
+    \begin{tikzpicture}[x=2.5cm, y=2.5cm]
       \def\a{2}; % a_min = 1; a_max = 2+sqrt(3) = 3.7321
       \def\b{\a/(2*\a-1)}
       \def\xx{1/(2*\a)};
       %
-      \draw[thin,->] (-0.2,0) -- (1.3,0) node[anchor=north west] {$\varphi$};
-      \draw[thin,->] (0,-0.2) -- (0,1.3) node[anchor=east] {$\varphi_{\text{PD}}(\varphi)$};
+      \draw[thin,->] (-0.2,0) -- (1.2,0) node[anchor=north west] {$\varphi$};
+      \draw[thin,->] (0,-0.2) -- (0,1.2) node[anchor=east] {$\varphi_{\text{PD}}(\varphi)$};
       \node[anchor=north east] at (0,0) {$0$};
       %
       \draw[domain=0:{atan(\a)},variable=\x] plot ({0.15*cos(\x)}, {0.15*sin(\x)});
-      \draw[very thin] (0.075,0.05) -- +(-60:0.15) node[below right] {$\arctan(a)$};
+      \draw[very thin] (0.075,0.05) -- +(-50:0.2) node[right] {$\arctan(a)$};
       \draw[thick,domain={atan(\a)-180}:{atan(\b)},variable=\x] plot ({\xx+0.2*cos(\x)}, {0.5+0.2*sin(\x)});
       \node[anchor=north west] at ({\xx},0.5) {$\vartheta$};
-      \draw[very thin] ({\xx-0.05},0.35) -- +(-200:0.3 ) node[left]  {$90^{\circ}\!-\!\arctan(a)$};
+      \draw[very thin] ({\xx-0.05},0.35) -- +( -50:0.15) node[right] {$90^{\circ}\!-\!\arctan(a)$};
       \draw[very thin] ({\xx+0.1 },0.53) -- +( 100:0.15) node[above] {$\arctan(b)$};
       \PDMcharact{0}{0}{\a};
       %
@@ -352,7 +354,25 @@ Core element of PDM is a phase distortion characteristic curve as shown in
       \draw[thin,dotted] (1    ,1  ) -- (1    ,-0.05) node[below] {$2\pi$};
       \draw[thin,dotted] (1    ,1  ) -- (-0.05, 1   ) node[left]  {$2\pi$};
     \end{tikzpicture}
-    \caption{Distortion angle $\vartheta$, $135^\circ\leq\vartheta\leq 180^\circ$\label{fig:PDMcc2}}
+    \caption{Distortion angle $\vartheta$,\newline $135^\circ\leq\vartheta\leq 180^\circ$\label{fig:PDMcc2}}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    %\centering
+    \hspace*{-28pt}
+    \begin{tikzpicture}[x=2.5cm, y=2.5cm]
+      \draw[thin,->] (-0.2,0) -- (1.2,0) node[anchor=north west] {$\varphi$};
+      \draw[thin,->] (0,-0.2) -- (0,1.2) node[anchor=east] {$\varphi_{\text{PD}}(\varphi)$};
+      \node[anchor=north east] at (0,0) {$0$};
+      \draw[thick] (0,0) -- (0,0.5) -- (1,1);
+      \draw[domain=0:{atan(0.5)},variable=\x] plot ({0.25*cos(\x)}, {0.5+0.25*sin(\x)});
+      \draw[very thin] (0.15,0.53) -- +(-70:0.2) node[right] 
+        {$\arctan\left(\frac{1}{2}\right)\approx 26.6^\circ$};
+      \draw[thin,dotted] (1,1  ) -- (1    ,-0.05) node[below] {$2\pi$};
+      \draw[thin,dotted] (1,1  ) -- (-0.05, 1   ) node[left]  {$2\pi$};
+      \draw[thin,dotted] (1,0.5) -- (-0.05, 0.5 ) node[left]  {$\pi$};
+    \end{tikzpicture}
+    \caption{Minimum distortion angle\newline 
+      $\vartheta_{\min}\approx 116.6\,^\circ$, $a\to\infty$\label{fig:PDMcc3}}
   \end{subfigure}
   \caption{Characteristic curve of phase distortortion}
 \end{figure*}
@@ -431,14 +451,16 @@ table in \cref{fig:PDMaToTheta}.
     \caption{Distortion angle parameter $\vartheta$ as a function of slope parameter $a$}
   \end{subfigure}
   \begin{subfigure}{0.45\textwidth}
-    \centering
-    \begin{tabular}{llcll}\\ \toprule
-      $\vartheta/^\circ$ & $a$ & & $\vartheta/^\circ$ & $a$  \\\midrule
-      $135$ & $2\!+\!\sqrt{3}\approx 3.73$ && $160$ & $1.52$ \\
-      $140$ & $2.92$                       && $165$ & $1.35$ \\
-      $145$ & $2.39$                       && $170$ & $1.21$ \\
-      $150$ & $2.02$                       && $175$ & $1.10$ \\
-      $155$ & $1.74$                       && $180$ & $1.00$ \\\bottomrule \\
+    \centering\vspace*{-3pt}
+    \begin{tabular}{llcll}\toprule
+      $\vartheta/^\circ$ & $a$ & & $\vartheta/^\circ$ & $a$    \\\midrule
+      $116.6$ & $\infty$                     && $150$ & $2.02$ \\
+      $120$   & $20.07$                      && $155$ & $1.74$ \\
+      $125$   & $8.19$                       && $160$ & $1.52$ \\
+      $130$   & $5.14$                       && $165$ & $1.35$ \\
+      $135$   & $2\!+\!\sqrt{3}\approx 3.73$ && $170$ & $1.21$ \\
+      $140$   & $2.92$                       && $175$ & $1.10$ \\
+      $145$   & $2.39$                       && $180$ & $1.00$ \\\bottomrule
     \end{tabular}
     \caption{Lookup table}
   \end{subfigure}
