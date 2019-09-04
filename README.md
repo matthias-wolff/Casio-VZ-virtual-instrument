@@ -1,16 +1,17 @@
 # vVZ-1
-A virtual replica of the Casio VZ-1/VZ-10M music synthesizer
+A virtual replica of the Casio VZ-1/VZ-10M/VZ-8M music synthesizer
 
 ### Project Outline
-In this project I try to rebuild the vintage Casio VZ-1/VZ-10M music synthesizer in [Reaktor 6](https://www.native-instruments.com/en/products/komplete/synths/reaktor-6). The primary goal is a fully functional player which is compatible with MIDI editor/librarian software like [Midi Quest](https://squest.com/Products/MidiQuest12/index.html) or the like. My workplan is
+In this project I try to rebuild the vintage Casio VZ-1/VZ-10M/VZ-8M music synthesizer in [Reaktor 6](https://www.native-instruments.com/en/products/komplete/synths/reaktor-6). The primary goal is a fully functional player which is compatible with MIDI editor/librarian software like [Midi Quest](https://squest.com/Products/MidiQuest12/index.html) or the like. My workplan is
 1. Make some debugging and development tools (waveform validator, envelope validator, etc.)
-2. Reproduce the 8 core waveforms of VZ-1/VZ-10M (1x sine, 5x sawtooth-like waveforms created by Casio's Phase Distortion Modulation, 1x white noise, 1x pitch-sensitive narrow-band noise)
-3. Implement the core sound engine (wavetable oscillators, phase and ring modulators, VCAs, oscillator circuits)
+2. Reproduce the 8 core waveforms of VZ (1x sine, 5x sawtooth-like waveforms created by Casio's Phase Distortion Modulation, 1x white noise, 1x pitch-sensitive narrow-band noise---or 
+   just a mix of white noise and a sine?)
+3. Implement the core sound engine (wavetable oscillators, phase and ring modulators, DCAs, oscillator circuits)
 4. Implement control signal generators (amplitude envelope, key following, layering, parametric sensitivity characterisitcs, etc.)
 5. Implement MIDI SysEx control capability
 6. Reproduce the factory voice and operation libraries
 
-I always strongly disliked the unpleasant - though most characteristic - aliasing and analog noise of the VZ-1. Hence, I will not attempt to reproduce this. Insofar, the remake is not intended to be perfect.
+I always strongly disliked the unpleasant---though most characteristic---aliasing and analog noise of the VZ. Hence, I will not attempt to reproduce this. Insofar, the remake is not intended to be perfect.
 
 As a secondary goal I may want to reproduce the GUI of the original instrument. This would be a nice-to-have, however not necessarily of much practical use.
 
@@ -19,7 +20,7 @@ As this is a mere hobby project, I cannot tell how far I will come with it. At a
 
 If you are interested in collaborating, please let me know! It's much more fun to work together :)
 
-Matthias Wolff<br>
+Matthias Wolff<sup>&nbsp;[[0000-0002-3895-7313](https://orcid.org/0000-0002-3895-7313)]</sup><br>
 Aug. 30, 2019
 
 ----------
