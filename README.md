@@ -31,14 +31,16 @@ Aug. 30, 2019
 * [Casio CZ for iOS](https://www.amazona.de/test-casio-cz-virtueller-phase-distortion-synth-ios/) - another virtual remake of the CZ-1 by Casio itself
 
 ##### 2. Information on the VZ-1/VZ-10M Synthesizers
-* [Green Box. Casio VZ-1, VZ-10M, VZ-8M, Hohner HS-2/E](https://www.amazona.de/green-box-casio-vz-1-vz-10m-vz-8m-hohner-hs-2-e/)
-* [Workshop. Casio CZ/VZ und die Grundlagen der Phase Distortion Synthesis](https://www.amazona.de/workshop-casio-czvz-und-die-grundlagen-der-phase-distortion-synthesis/)
-* [ProckGnosis. Casio VZ-10M - Exploring the Synth and Sounds](https://www.youtube.com/watch?v=YF16PshtaMs)
+* [Green Box. Casio VZ-1, VZ-10M, VZ-8M, Hohner HS-2/E. AMAZONA.de, 2018](https://www.amazona.de/green-box-casio-vz-1-vz-10m-vz-8m-hohner-hs-2-e/)
+* [Workshop. Casio CZ/VZ und die Grundlagen der Phase Distortion Synthesis. AMAZONA.de, 
+  2008](https://www.amazona.de/workshop-casio-czvz-und-die-grundlagen-der-phase-distortion-synthesis/)
+* [ProckGnosis. Casio VZ-10M - Exploring the Synth and Sounds. YouTube video, 2019](https://www.youtube.com/watch?v=YF16PshtaMs)
 
 ##### 3. Sound Examples
-* [RetroSound. CASIO VZ-1 iPD Synthesizer "VeeZeeOne"](https://www.youtube.com/watch?v=mWFKpTlMaYM)
-* [RetroSound. CASIO VZ-1 iPD Synthesizer (1987)](https://www.youtube.com/watch?v=LVG_FVgP7yU)
+* [RetroSound. CASIO VZ-1 iPD Synthesizer "VeeZeeOne". YouTube video, 2015](https://www.youtube.com/watch?v=mWFKpTlMaYM)
+* [RetroSound. CASIO VZ-1 iPD Synthesizer (1987). YouTube video, 2015](https://www.youtube.com/watch?v=LVG_FVgP7yU)
 
 ##### 4. Tutorials
-* [ADSR Tutorials. Reaktor - Drawable Wavetable Oscillators](https://www.youtube.com/watch?v=TtkViDlVx-Y)
-* [ADSR Tutorials. Working with Phase Modulation in Reaktor](https://www.youtube.com/watch?v=I1u2WKA9p3c)
+* [ADSR Tutorials. Reaktor - Drawable Wavetable Oscillators. YouTube video, 2013](https://www.youtube.com/watch?v=TtkViDlVx-Y)
+* [ADSR Tutorials. Working with Phase Modulation in Reaktor. YouTube video, 2013](https://www.youtube.com/watch?v=I1u2WKA9p3c)
+* [ADSR Tutorials. Working with Stacked Macros In Reaktor. YouTube video, 2013](https://www.youtube.com/watch?v=DrrV_ce0cUE)
