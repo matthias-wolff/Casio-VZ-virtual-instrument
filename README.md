@@ -46,3 +46,7 @@ Aug. 30, 2019
 * [ADSR Tutorials. Reaktor - Drawable Wavetable Oscillators. YouTube video, 2013](https://www.youtube.com/watch?v=TtkViDlVx-Y)
 * [ADSR Tutorials. Working with Phase Modulation in Reaktor. YouTube video, 2013](https://www.youtube.com/watch?v=I1u2WKA9p3c)
 * [ADSR Tutorials. Working with Stacked Macros In Reaktor. YouTube video, 2013](https://www.youtube.com/watch?v=DrrV_ce0cUE)
+
+##### 5. Tools
+* [Blue Cat's Analysis Pack](https://www.bluecataudio.com/Products/Bundle_AnalysisPack/)
+* [s(M)exoscope](http://bram.smartelectronix.com/plugins.php?id=4)
