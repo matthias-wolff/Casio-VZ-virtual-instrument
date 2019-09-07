@@ -1,4 +1,4 @@
-# vVZ-1
+# vVZ
 A virtual replica of the Casio VZ-1/VZ-10M/VZ-8M music synthesizer
 
 ### Project Outline
