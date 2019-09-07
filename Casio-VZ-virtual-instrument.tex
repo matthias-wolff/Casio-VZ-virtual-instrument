@@ -261,19 +261,27 @@ complex tones comprise aperodic components (noise) and varying timbre over time.
 \end{figure*}
 
 As human perception of sound frequency is nearly logarithmic, Western music
-theory commonly uses the pitch
+theory commonly uses the pitch 
 \begin{equation}
   \label{eqn:f2p}
-  p = 1200\cdot\log_2\!\left(\dfrac{f_0}{f_{\text{a}^1}}\right)
+  p = 69 + 12\,\log_2\!\left(\dfrac{f_0}{440\,\text{Hz}}\right)
+  \qquad\text{\TT{p=f2p(f)}}
 \end{equation}
-measured in Cents (ct). The quantity in the denominator is a reference
-frequency. I will use the concert pitch $f_{\text{a}^1}=440\,$Hz. Musical
-intervals can be measured in terms of pitch. E.g., a semitone spans $100$\,ct, a
-fith spans $500$\,ct, and an octave spans $1200$\,ct. Solving \cref{eqn:f2p}
-for $f_0$, we obtain a formula for converting pitch to frequency:
+measured in semitones. The value of $440\,\text{Hz}$ in the denominator is the
+concert pitch. The offset of $69$ makes the pitch computed by \cref{eqn:f2p}
+compatible with a MIDI frequency data value. According to the MIDI
+\CHECK{tuning} standard \TODO{\cite{}}, $p$ takes values from the interval
+$0.00\leq p\leq 127.99$ with the integer part corresponding to a note number and
+the decimal fraction, with two digits precision, to a detune. MIDI note number
+$p=0$ stands for C$_{-1}$, $p=69$ for the concert pitch A$_4$, and $p=127$
+stands for B$_9$.
+
+Solving \cref{eqn:f2p} for $f_0$, we obtain a formula for converting pitch to
+frequency:
 \begin{equation}
   \label{eqn:p2f}
-  f_0 = f_{\text{a}^1}\cdot 2^{\frac{p}{1200}}.
+  f_0 = 2^{\frac{p-69}{12}}\cdot 440\,\text{Hz}
+  \qquad\text{\TT{f=p2f(p)}}.
 \end{equation}
 
 \subsubsection{Phase Distortion Modulation}
@@ -649,14 +657,16 @@ noise (\TT{NOISE1}), and narrow-band noise (\TT{NOISE2}).
 In order to read the wavetable out of my VZ-1, I proceeded as follows
 \begin{enumerate}
   \item
+    Set the master tune of VZ-1 to $440\,$Hz in \TT{MENU 3-00},
+  \item
     Initialize a new voice,
   \item
     Mute all oscillator modules except \TT{M1} and configure line \TT{A} as 
     \TT{MIX} in \TT{MENU 1/00},
   \item 
-    In \TT{MENU 1/02}, set \TT{M1} to a fix pitch of \TODO{\TT{OCT=??},
-    \TT{NOTE=??}, \TT{FINE=??}} to generate tones with a frequency of
-    $46^7\!/_8$\,Hz (see below),
+    In \TT{MENU 1/02}, set \TT{M1} to a fix pitch of \TT{OCT=00}, \TT{NOTE=00},
+    \TT{FINE=08} to generate tones with a frequency of $46^7\!/_8$\,Hz (see
+    below),
   \item
     Configure all amplitude controls of \TT{M1} for maximum signal output and
     set a trivial amplitude envelope mimicking a mere gate signal,
