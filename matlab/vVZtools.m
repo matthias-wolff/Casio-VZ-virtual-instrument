@@ -10,7 +10,7 @@ classdef vVZtools
     function p = f2p(f)
       % Converts note frequency to pitch based on the concert pitch A4=440 Hz.
       %
-      %   p = f2p(f)
+      %   p = vVZtools.f2p(f)
       %
       % arguments:
       %   f - Note frequency in Hz
@@ -26,7 +26,7 @@ classdef vVZtools
     function [OCT,NOTE,FINE] = f2vzp(f)
       % Converts note frequency to a VZ fix pitch setting (Menu 1-02, PITCH FIX=ON). 
       %
-      %   [OCT,NOTE,FINE] = f2vzp(f)
+      %   [OCT,NOTE,FINE] = vVZtools.f2vzp(f)
       %
       % arguments:
       %   f    - Tone frequency in Hz
@@ -70,7 +70,7 @@ classdef vVZtools
     function f = p2f(p)
       % Converts pitch to note frequency based on the concert pitch A4=440 Hz.
       %
-      %   f = p2f(p)
+      %   f = vVZtools.p2f(p)
       %
       % arguments:
       %   p - Pitch or MIDI note number
@@ -91,8 +91,8 @@ classdef vVZtools
     function x1 = pmInvert(y,x2,C)
       % Inverts the phase modulation y(k) = x2(k + K*x1(k)).
       %
-      %   x1 = pmInverse(y,x2)
-      %   x1 = pmInverse(y,x2,C)
+      %   x1 = vVZtools.pmInverse(y,x2)
+      %   x1 = vVZtools.pmInverse(y,x2,C)
       %
       % arguments:
       %   y  - The phase-modulated signal, a vector of samples representing
@@ -153,13 +153,13 @@ classdef vVZtools
     
   end
 
-  %% == Label Files ============================================================
+  %% == Labeling ===============================================================
   methods(Static)
     
     function lab = readTimit(fnTimit,filter)
       % Reads a TIMIT label file.
       %
-      %   lab = readTIMIT(fnTimit,filter)
+      %   lab = vVZtools.readTIMIT(fnTimit,filter)
       %
       % arguments:
       %   fnTimit - Name of TIMIT label file
@@ -191,6 +191,70 @@ classdef vVZtools
       end
     end
     
+    function lab = pitchMark(wave,k,K)
+      % Crude pitch marker.
+      %
+      %   lab = vVZtools.pitchMark(x,k,K)
+      %
+      % arguments:
+      %   x   - The signal to label, a vector of samples.
+      %   k   - Zero-based index of an initial pitchmark.
+      %   K   - Approximate cycle length in samples.
+      %
+      % returns:
+      %   lab - The pitch marks in the TIMIT label format.
+      %
+      % See also readTimit
+      
+      n = 0.05*K;
+      [kz,rising] = vVZtools.findZeroCrossing(wave,k,n);
+      while kz>0
+        % TODO: ...
+      end
+    end
+    
   end
+  
+  methods(Static,Access=protected)
+    
+    function [kz,rising] = findZeroCrossing(wave,k,n)
+      kz = -1;
+      rising = false;
+      for i=0:n
+
+        % Look i samples left of k
+        try
+          if wave(k-i)>=0 && wave(k-i+1)<=0
+            kz = k-i;
+            rising = false;
+            break;
+          elseif wave(k-i)<=0 && wave(k-i+1)>=0
+            kz = k-i;
+            rising = true;
+            break;
+          end
+        catch
+          % Ignore
+        end
+        
+        % Look i samples right of k
+        try
+          if wave(k+i)>=0 && wave(k+i+1)<=0
+            kz = k+i;
+            rising = false;
+            break;
+          elseif wave(k+i)<=0 && wave(k+i+1)>=0
+            kz = k+i;
+            rising = true;
+            break;
+          end
+        catch
+          % Ignore
+        end
+      end
+    end
+    
+  end
+    
 end
 % EOF
