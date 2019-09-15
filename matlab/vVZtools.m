@@ -190,22 +190,24 @@ classdef vVZtools
       fn = strrep(fn,'\','/');
     end
     
-    function lab = timitread(fnTimit,filter)
+    function lab = timitread(fn,filter)
       % Reads a TIMIT label file.
       %
-      %   lab = vVZtools.timitread(fnTimit,filter)
+      %   lab = vVZtools.timitread(fn,filter)
       %
       % arguments:
-      %   fnTimit - Name of TIMIT label file
-      %   filter  - Label name to filter for (optional, default is no filtering)
+      %   fn     - Name of TIMIT label file
+      %   filter - Label name to filter for (optional, default is no filtering)
       %
       % returns:
-      %   lab     - The labels as a table containing the following variables:
-      %             - k_S : zero-based sample index of label beginning
-      %             - k_E : zero-based sample index of label end
-      %             - name: label name
+      %   lab    - The labels as a table containing the following variables:
+      %            - k_S : zero-based sample index of label beginning
+      %            - k_E : zero-based sample index of label end
+      %            - name: label name
+      %
+      % See also timitwrite
       
-      fid = fopen(fnTimit,'r');
+      fid = fopen(fn,'r');
       l = textscan(fid,'%d %d %s');
       fclose(fid);
       k_S = l{1};
@@ -225,7 +227,42 @@ classdef vVZtools
       end
     end
     
-    function [wave,pm,props] = loadRecording(rid)
+    function timitwrite(fn,lab)
+      % Reads a TIMIT label file.
+      %
+      %   vVZtools.timitwrite(fn,lab)
+      %
+      % arguments:
+      %   fn  - Name of TIMIT label file
+      %   lab - The labels as a table containing the following variables:
+      %         - k_S : zero-based sample index of label beginning
+      %         - k_E : zero-based sample index of label end
+      %         - name: label name
+      %
+      % throws exception:
+      %   - If lab has a wring format
+      %   - If the output file cannot be written
+      %
+      % See also timitread
+      
+      % Get table variables
+      k_S  = lab.k_S;
+      k_E  = lab.k_E;
+      name = lab.name;
+      
+      % Create path
+      path = fileparts(fn);
+      mkdir(path);
+ 
+      % Write output file
+      fid  = fopen(fn,'w');
+      for i=1:length(k_S)
+        fprintf(fid,'%d %d %s\n',k_S(i),k_E(i),name{i});
+      end
+      fclose(fid);      
+    end
+    
+    function [wave,pm,props,msg] = loadRecording(rid)
       % Loads a vVZ rescording.
       %
       %   [wave,pm,props] = vVZtools.oadRecording(rid)
@@ -239,37 +276,75 @@ classdef vVZtools
       %   pm    - Pitch marks, an arry of zero-based sample indexes or an empty
       %           array if no pitch mark file exists for the recording ID
       %   props - RESERVED
+      %   msg   - Message
       %
       % See also getWavFn, getPmFn
       
+      fprintf('vVZtools.loadRecording(rid="%s")\n',rid);
       wave  = [];
       pm    = [];
       props = [];
+      msg   = 'ok';
 
       % Read wave file
       fn = vVZtools.getWaveFn(rid);
+      fprintf('- Read wave file "%s"\n',fn);
       try
         wave = audioread(fn);
+        fprintf('  - OK, %d samples\n',length(wave));
       catch ME
-        warning('Cannot read wave file \"%s\"',fn);
-        disp(ME);
+        msg = sprintf('Cannot read wave file "%s". Reason: %s',fn,ME.message);
+        fprintf('  - FAILED, reason: %s\n',ME.message);
+        return;
       end
       
       % Read pitch mark file
       fn = vVZtools.getPmFn(rid);
+      fprintf('- Read pitch marks file "%s"\n',fn);
       try
-        pm = vVZtools.timitread(fn,'PM');
+        lab = vVZtools.timitread(fn,'PM');
+        pm  = lab.k_E;
+        fprintf('  - OK, %d pitch marks\n',length(pm));
       catch ME
-        warning('Cannot read label file \"%s\"',fn);
-        disp(ME);
+        msg = sprintf('Cannot read label file "%s". Reason: %s',fn,ME.message);
+        fprintf('  - FAILED, reason: %s\n',ME.message);
       end
       
       % TODO: Read props from par file!
     end  
     
-    function tf = savePitchMarks(rid,pm)
-      tf = false;
-      disp(pm);
+    function [status,msg] = savePitchMarks(rid,pm)
+
+      fprintf('vVZtools.savePitchMarks(rid="%s")\n',rid);
+      
+      % Prepare label table
+      k_E  = sort(pm);
+      k_S  = zeros(length(pm),1);
+      name = cell(length(pm),1);
+      for i=1:length(pm)
+        if i==1
+          k_S(i) = 0;
+        else
+          k_S(i) = k_E(i-1);
+        end
+        name{i} = 'PM';
+      end
+      lab = table(k_S,k_E,name);
+      
+      % Write TIMIT file
+      fn = vVZtools.getPmFn(rid);
+      fprintf('- Write pitch mark file "%s"\n',fn);
+      try
+        vVZtools.timitwrite(fn,lab);
+        status = 1;
+        msg    = 'ok';
+        fprintf('  - OK\n');
+      catch ME
+        status = 0;
+        msg    = sprintf('Cannot write file "%s". Reason %s',fn,ME.message);
+        fprintf('  - FAILED, reason: %s\n',ME.message);
+      end
+      
     end
     
   end
@@ -405,7 +480,7 @@ classdef vVZtools
       %
       % See also zeroCrossingR, zeroCrossingF
       
-      fprintf('autoPitchMark(k0=%d, K0=%d, l=%d, t=%f)\n',k0,K0,l,t);
+      fprintf('vVZtools.autoPitchMark(k0=%d, K0=%d, l=%d, t=%f)\n',k0,K0,l,t);
       pm  = [];
       K0m = -1;
 
@@ -474,7 +549,7 @@ classdef vVZtools
           kz = vVZtools.seekClosest(wave,k,L,@vVZtools.zeroCrossingR,l,t);
         end
         if kz<0; break; end
-        fprintf('- Pitch mark at at             : k=%d\n',kz);
+        %fprintf('- Pitch mark at                : k=%d\n',kz);
         pm(length(pm)+1) = kz; %#ok
         k = kz-K0;
       end
@@ -492,17 +567,22 @@ classdef vVZtools
           kz = vVZtools.seekClosest(wave,k,L,@vVZtools.zeroCrossingR,l,t);
         end
         if kz<0; break; end
-        fprintf('- Pitch mark at                : k=%d\n',kz);
+        %fprintf('- Pitch mark at                : k=%d\n',kz);
         pm(length(pm)+1) = kz;
         k = kz+K0;
       end
-        
+      
+      % Sort pitch marks
+      pm = sort(pm);
+      fprintf('- Found %d further zero-crossings\n',length(pm)-2);
+      
       % Compute mean cylce length
       K0m = 0;
       for i=2:length(pm)
         K0m = K0m + (pm(i)-pm(i-1));
       end
       K0m = K0m/(length(pm)-1);
+      fprintf('- Mean cycle length: %f samples\n',K0m);
     end
     
   end
