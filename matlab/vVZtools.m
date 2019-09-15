@@ -91,8 +91,8 @@ classdef vVZtools
     function x1 = pmInvert(y,x2,C)
       % Inverts the phase modulation y(k) = x2(k + K*x1(k)).
       %
-      %   x1 = vVZtools.pmInverse(y,x2)
-      %   x1 = vVZtools.pmInverse(y,x2,C)
+      %   x1 = vVZtools.pmInvert(y,x2)
+      %   x1 = vVZtools.pmInvert(y,x2,C)
       %
       % arguments:
       %   y  - The phase-modulated signal, a vector of samples representing
@@ -153,13 +153,47 @@ classdef vVZtools
     
   end
 
-  %% == Labeling ===============================================================
+  %% == Recording files ========================================================
   methods(Static)
+
+    function fn = getWaveFn(rid)
+      % Obtains the wave file name for a vVZ recording ID.
+      %
+      %    fn = vVZtools.getWaveFn(rid)
+      %
+      % arguments:
+      %   rid - The recording ID, e.g., 'recordings/wavetable/SAW1'
+      %
+      % returns:
+      %   fn  - The file name: <vVZ>/waves/<rid>.wav
+      %
+      % See also getPmFn
+
+      fn = ['../waves/' rid '.wav'];
+      fn = strrep(fn,'\','/');
+    end
+
+    function fn = getPmFn(rid)
+      % Obtains the pitch mark file name for a vVZ recording ID.
+      %
+      %    fn = vVZtools.getPmFn(rid)
+      %
+      % arguments:
+      %   rid - The recording ID, e.g., 'recordings/wavetable/SAW1'
+      %
+      % returns:
+      %   fn  - The file name: <vVZ>/labels/<rid>.pm
+      %
+      % See also getWaveFn
+      
+      fn = ['../labels/' rid '.pm'];
+      fn = strrep(fn,'\','/');
+    end
     
-    function lab = readTimit(fnTimit,filter)
+    function lab = timitread(fnTimit,filter)
       % Reads a TIMIT label file.
       %
-      %   lab = vVZtools.readTIMIT(fnTimit,filter)
+      %   lab = vVZtools.timitread(fnTimit,filter)
       %
       % arguments:
       %   fnTimit - Name of TIMIT label file
@@ -191,70 +225,287 @@ classdef vVZtools
       end
     end
     
-    function lab = pitchMark(wave,k,K)
-      % Crude pitch marker.
+    function [wave,pm,props] = loadRecording(rid)
+      % Loads a vVZ rescording.
       %
-      %   lab = vVZtools.pitchMark(x,k,K)
+      %   [wave,pm,props] = vVZtools.oadRecording(rid)
       %
       % arguments:
-      %   x   - The signal to label, a vector of samples.
-      %   k   - Zero-based index of an initial pitchmark.
-      %   K   - Approximate cycle length in samples.
+      %   rid   - The recording ID, e.g., 'recordings/wavetable/SAW1'
       %
       % returns:
-      %   lab - The pitch marks in the TIMIT label format.
+      %   wave  - The recording, an array of samples or an empty array if no
+      %           wave file exists for the recording ID
+      %   pm    - Pitch marks, an arry of zero-based sample indexes or an empty
+      %           array if no pitch mark file exists for the recording ID
+      %   props - RESERVED
       %
-      % See also readTimit
+      % See also getWavFn, getPmFn
       
-      n = 0.05*K;
-      [kz,rising] = vVZtools.findZeroCrossing(wave,k,n);
-      while kz>0
-        % TODO: ...
+      wave  = [];
+      pm    = [];
+      props = [];
+
+      % Read wave file
+      fn = vVZtools.getWaveFn(rid);
+      try
+        wave = audioread(fn);
+      catch ME
+        warning('Cannot read wave file \"%s\"',fn);
+        disp(ME);
       end
+      
+      % Read pitch mark file
+      fn = vVZtools.getPmFn(rid);
+      try
+        pm = vVZtools.timitread(fn,'PM');
+      catch ME
+        warning('Cannot read label file \"%s\"',fn);
+        disp(ME);
+      end
+      
+      % TODO: Read props from par file!
+    end  
+    
+    function tf = savePitchMarks(rid,pm)
+      tf = false;
+      disp(pm);
     end
     
   end
   
-  methods(Static,Access=protected)
-    
-    function [kz,rising] = findZeroCrossing(wave,k,n)
-      kz = -1;
-      rising = false;
-      for i=0:n
+  %% == Labeling ===============================================================
+  methods(Static)
 
-        % Look i samples left of k
-        try
-          if wave(k-i)>=0 && wave(k-i+1)<=0
-            kz = k-i;
-            rising = false;
-            break;
-          elseif wave(k-i)<=0 && wave(k-i+1)>=0
-            kz = k-i;
-            rising = true;
-            break;
-          end
-        catch
-          % Ignore
+    function kf = seekClosest(wave,k,L,fnc,varargin)
+      % Seeks an event in a wave
+      %
+      %   kf = seekClosest(wave,k,L,@zeroCrossingF,l,t)
+      %   kf = seekClosest(wave,k,L,@zeroCrossingR,l,t)
+      %
+      % arguments:
+      %   wave     - A vector of samples
+      %   k        - Zero-based sample index to start seeking from
+      %   L        - Range to seek in: [k-L,k+L]
+      %   fnc      - Detector function (see remarks)
+      %   varargin - Additional arguments to detector function
+      %
+      % returns: 
+      %   kf       - Zero-based sample index of closest event or
+      %              -1 if no event has been found
+      %
+      % remarks:
+      %   Valid detector functions have the signature
+      %
+      %      tf = fnc(wave,k,varargin)
+      %
+      %   where the return value is a Boolean indicating the detection
+      %   result. Detector functions must cope with indexes k<0 and
+      %   k>length(wave)-1 without throwing exceptions!
+
+      kf = -1;
+      for dk=0:L
+        if fnc(wave,k+dk,varargin)
+          kf = k+dk;
+          return;
         end
-        
-        % Look i samples right of k
-        try
-          if wave(k+i)>=0 && wave(k+i+1)<=0
-            kz = k+i;
-            rising = false;
-            break;
-          elseif wave(k+i)<=0 && wave(k+i+1)>=0
-            kz = k+i;
-            rising = true;
-            break;
-          end
-        catch
-          % Ignore
+        if fnc(wave,k-dk,varargin)
+          kf = k-dk;
+          return;
         end
       end
     end
     
-  end
+    function tf = zeroCrossingF(wave,k,l,t)
+      % Detects a falling-edge zero crossing.
+      %
+      %   tf = zeroCrossingF(wave,k,l,t)
+      %
+      % arguments:
+      %   wave - A vector of samples
+      %   k    - Zero-based sample index to examine
+      %   l    - Detection window [k-l,k+l]
+      %   t    - Detection threshold (samples values left of k must reach
+      %          t, sample values right of k must reach -t)
+      %
+      % returns:
+      %   tf   - True if a falling-edge zero crossing is at k,
+      %          false otherwise
+      %
+      % See also zeroCrossingR, autoPitchMark
+
+      if nargin==3 && iscell(l)                                                 % Args.3,4 committed as cell array >>
+        t = l{2};                                                               %   Get t
+        l = l{1};                                                               %   Get l
+      end                                                                       % <<
+      tf = false;                                                               % Initialize return value
+      K  = length(wave);                                                        % Length wave
+      if k<l || k>=K-l; return; end                                             % k too close to ends -> return
+      i = k+1;                                                                  % One-based sample index
+      wl = wave(i-l:i-1);                                                       % L samples left of k
+      wr = wave(i:i+l);                                                         % L samples right of k
+      if ~all(wl> 0); return; end                                               % non-positive left samples -> return
+      if ~all(wr<=0); return; end                                               % positive right samples -> return
+      if max(wl)< t ; return; end                                               % threshold missed left -> return
+      if min(wr)>-t ; return; end                                               % threshold missed right -> return
+      tf = true;                                                                % Yup - there's a zero cr. at k
+    end
     
+    function tf = zeroCrossingR(wave,k,l,t)
+      % Detects a rising-edge zero crossing.
+      %
+      %   tf = zeroCrossingR(wave,k,l,t)
+      %
+      % arguments:
+      %   wave - A vector of samples
+      %   k    - Zero-based sample index to examine
+      %   l    - Detection window [k-l,k+l]
+      %   t    - Detection threshold (samples values left of k must reach
+      %          t, sample values right of k must reach -t)
+      %
+      % returns:
+      %   tf   - True if a rising-edge zero crossing is at k,
+      %          false otherwise
+      %
+      % See also zeroCrossingF, autoPitchMark
+
+      if nargin==3 && iscell(l)                                                 % Args.3,4 committed as cell array >>
+        t = l{2};                                                               %   Get t
+        l = l{1};                                                               %   Get l
+      end                                                                       % <<
+      tf = false;                                                               % Initialize return value
+      K  = length(wave);                                                        % Length wave
+      if k<l || k>=K-l; return; end                                             % k too close to ends -> return
+      i = k+1;                                                                  % One-based sample index
+      wl = wave(i-l:i-1);                                                       % L samples left of k
+      wr = wave(i:i+l);                                                         % L samples right of k
+      if ~all(wl< 0); return; end                                               % non-negtive left samples -> return
+      if ~all(wr>=0); return; end                                               % negative right samples -> return
+      if min(wl)>-t ; return; end                                               % threshold missed left -> return
+      if max(wr)< t ; return; end                                               % threshold missed right -> return
+      tf = true;                                                                % Yup - there's a zero cr. at k
+    end
+
+    function [pm,K0m] = autoPitchMark(wave,k0,K0,l,t)
+      % Automatic pitch marking.
+      %
+      %   [pm,K0m] = vVZtools.autoPitchMark(wave,k0,K0,l,t)
+      %
+      % arguments:
+      %   wave - A vector of samples
+      %   k0   - Zero-based sample index of approximate position of first
+      %          pitch mark
+      %   K0   - Approximate cycle length in samples
+      %   l    - Length of zero-crossing detection window
+      %   t    - Zero-crossong detection threashold
+      %
+      % returns:
+      %   pm   - The pitch detected marks, an array of zero-based sample indexes
+      %   K0m  - The average cycle length in samples
+      %
+      % See also zeroCrossingR, zeroCrossingF
+      
+      fprintf('autoPitchMark(k0=%d, K0=%d, l=%d, t=%f)\n',k0,K0,l,t);
+      pm  = [];
+      K0m = -1;
+
+      % Pre-cheks
+      if isempty(wave); return; end
+      K = length(wave);
+      if k0<0 || k0>=K
+        warning('k0 must be in [0,%d]. ABORTING.',K-1);
+        return;
+      end
+      if K0<=0
+        warning('K must be positive. ABORTING.');
+        return;
+      end
+      
+      % Search initial zero-crossing near k0
+      fprintf('- Pitch mark at cycle beginning: ');
+      L   = round(K0/4); % Search range
+      kzf = vVZtools.seekClosest(wave,k0,L,@vVZtools.zeroCrossingF,l,t);
+      kzr = vVZtools.seekClosest(wave,k0,L,@vVZtools.zeroCrossingR,l,t);
+      if kzf>=0 && kzr>=0
+        if abs(k0-kzf)<=abs(k0-kzr)
+          kz0 = kzf;
+          falling = true;
+        else
+          kz0 = kzr;
+          falling = false;
+        end
+      elseif kzf>=0
+        kz0 = kzf;
+        falling = true;
+      elseif kzr>=0
+        kz0 = kzr;
+        falling = false;
+      else
+        fprintf('not found -> ABORT\n');
+        return;
+      end
+      if falling
+        fprintf('k=%d, falling edge\n',kz0);
+      else
+        fprintf('k=%d, rising edge\n',kz0);
+      end
+
+      % Seek zero-crossing near k0+K0
+      if falling
+        kz1 = vVZtools.seekClosest(wave,k0+K0,L,@vVZtools.zeroCrossingF,l,t);
+      else
+        kz1 = vVZtools.seekClosest(wave,k0+K0,L,@vVZtools.zeroCrossingR,l,t);
+      end
+      fprintf('- Pitch mark at cycle end      : ');
+      if kz1<0
+        fprintf('not found -> ABORT\n');
+        return;
+      else
+        K0 = kz1-kz0;
+        fprintf('k=%d, K0:=%d\n',kz1,K0);
+      end
+
+      % Seek further zero-crossings to the left
+      k = kz0-K0;
+      while k>0
+        if falling
+          kz = vVZtools.seekClosest(wave,k,L,@vVZtools.zeroCrossingF,l,t);
+        else
+          kz = vVZtools.seekClosest(wave,k,L,@vVZtools.zeroCrossingR,l,t);
+        end
+        if kz<0; break; end
+        fprintf('- Pitch mark at at             : k=%d\n',kz);
+        pm(length(pm)+1) = kz; %#ok
+        k = kz-K0;
+      end
+      
+      % Add initial pitch marks to output
+      pm(length(pm)+1) = kz0;
+      pm(length(pm)+1) = kz1;
+
+      % Seek further zero-crossings to the right
+      k = kz1+K0;
+      while k<K-1
+        if falling
+          kz = vVZtools.seekClosest(wave,k,L,@vVZtools.zeroCrossingF,l,t);
+        else
+          kz = vVZtools.seekClosest(wave,k,L,@vVZtools.zeroCrossingR,l,t);
+        end
+        if kz<0; break; end
+        fprintf('- Pitch mark at                : k=%d\n',kz);
+        pm(length(pm)+1) = kz;
+        k = kz+K0;
+      end
+        
+      % Compute mean cylce length
+      K0m = 0;
+      for i=2:length(pm)
+        K0m = K0m + (pm(i)-pm(i-1));
+      end
+      K0m = K0m/(length(pm)-1);
+    end
+    
+  end
+  
 end
 % EOF
