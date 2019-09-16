@@ -153,7 +153,7 @@ classdef vVZtools
     
   end
 
-  %% == Recording files ========================================================
+  %% == Signal and Label Files =================================================
   methods(Static)
 
     function fn = getWaveFn(rid)
@@ -189,6 +189,23 @@ classdef vVZtools
       fn = ['../labels/' rid '.pm'];
       fn = strrep(fn,'\','/');
     end
+
+    function fn = getParFn(rid)
+      % Obtains the annotation file name for a vVZ recording ID.
+      %
+      %    fn = vVZtools.getParFn(rid)
+      %
+      % arguments:
+      %   rid - The recording ID, e.g., 'recordings/wavetable/SAW1'
+      %
+      % returns:
+      %   fn  - The file name: <vVZ>/labels/<rid>.par
+      %
+      % See also getWaveFn
+      
+      fn = ['../labels/' rid '.par'];
+      fn = strrep(fn,'\','/');
+    end
     
     function lab = timitread(fn,filter)
       % Reads a TIMIT label file.
@@ -204,6 +221,9 @@ classdef vVZtools
       %            - k_S : zero-based sample index of label beginning
       %            - k_E : zero-based sample index of label end
       %            - name: label name
+      %
+      % throws exception:
+      %   - If the input file cannot be read
       %
       % See also timitwrite
       
@@ -228,7 +248,7 @@ classdef vVZtools
     end
     
     function timitwrite(fn,lab)
-      % Reads a TIMIT label file.
+      % Writes a TIMIT label file.
       %
       %   vVZtools.timitwrite(fn,lab)
       %
@@ -240,11 +260,11 @@ classdef vVZtools
       %         - name: label name
       %
       % throws exception:
-      %   - If lab has a wring format
+      %   - If lab has a wrong format
       %   - If the output file cannot be written
       %
       % See also timitread
-      
+
       % Get table variables
       k_S  = lab.k_S;
       k_E  = lab.k_E;
@@ -258,6 +278,105 @@ classdef vVZtools
       fid  = fopen(fn,'w');
       for i=1:length(k_S)
         fprintf(fid,'%d %d %s\n',k_S(i),k_E(i),name{i});
+      end
+      fclose(fid);      
+    end
+    
+    function lab = parread(fn,filter,exclude)
+      % Reads a Partitur label file.
+      %
+      %   lab = vVZtools.parread(fn,filter,exclude)
+      %
+      % arguments:
+      %   fn      - Name of Partitur label file
+      %   filter  - Tiers to include or exclude, a cell vector of strings or
+      %             character arrays (optional, default is no filtering)
+      %   exclude - if true, tiers listed in filter argument are excluded
+      %             (optional, default is false, i.e., tiers listed in filter 
+      %             argument are included)
+      %
+      % returns:
+      %   lab     - The labels as a table containing the following variables:
+      %             - tier : tier name
+      %             - value: value as string
+      %
+      % throws exception:
+      %   - If the input file cannot be read
+      %
+      % See also parwrite
+      
+      % Read and parse Partitur file
+      tier  = cell(0);
+      value = cell(0);
+      fid   = fopen(fn,'r');
+      i     = 1;
+      s     = fgetl(fid);
+      while ischar(s)
+        s = strtrim(s);
+        if strlength(s)>0
+          d = strfind(s,':');
+          if ~isempty(d)
+            tier{i,1}  = strtrim(s(1:d(1)-1));
+            value{i,1} = strtrim(s(d(1)+1:strlength(s)));
+            i = i+1;
+          end
+        end
+        s = fgetl(fid);
+      end
+      fclose(fid);
+      lab = table(tier,value);
+
+      % Filter tiers
+      if nargin>=2
+        if nargin<3; exclude = false; end
+        mask = contains(tier,filter);
+        if exclude; mask = 1-mask; end
+        i = 1;
+        while i<=height(lab)
+          if mask(i)==1
+            i = i+1;
+          else
+            mask(i,:) = [];
+            lab (i,:) = [];
+          end
+        end
+      end
+    end
+    
+    function parwrite(fn,lab)
+      % Writes a Partitur label file.
+      %
+      %   vVZtools.parwrite(fn,lab)
+      %
+      % arguments:
+      %   fn  - Name of TIMIT label file
+      %   lab - The labels as a table containing the following variables:
+      %         - tier : tier name
+      %         - value: value as string
+      %
+      % throws exception:
+      %   - If lab has a wrong format
+      %   - If the output file cannot be written
+      %
+      % See also parread
+      
+      % Get table variables
+      tier  = lab.tier;
+      value = lab.value;
+      
+      % Create path
+      path = fileparts(fn);
+      mkdir(path);
+ 
+      % Write output file
+      L = max(strlength(tier))+2;
+      fid  = fopen(fn,'w');
+      for i=1:length(tier)
+        if strlength(tier{i})>0 % Ignore empty tier tags!
+          s = [tier{i} ':'];
+          fmt = sprintf('%%-%ds%%s\\n',L);
+          fprintf(fid,fmt,s,value{i});
+        end
       end
       fclose(fid);      
     end
@@ -297,22 +416,42 @@ classdef vVZtools
         fprintf('  - FAILED, reason: %s\n',ME.message);
         return;
       end
-      
-      % Read pitch mark file
-      fn = vVZtools.getPmFn(rid);
-      fprintf('- Read pitch marks file "%s"\n',fn);
+
+      % Read annotation file
+      fn = vVZtools.getParFn(rid);
+      fprintf('- Read annotation file "%s"\n',fn);
       try
-        lab = vVZtools.timitread(fn,'PM');
-        pm  = lab.k_E;
-        fprintf('  - OK, %d pitch marks\n',length(pm));
+        fprintf('  - Read properties\n');
+        props = vVZtools.parread(fn,'PM',true);
+        fprintf('    - OK, %d properties\n',height(props));
+        fprintf('  - Read pitch marks\n');
+        lab = vVZtools.parread(fn,'PM');
+        pm = zeros(height(lab),1);
+        for i=1:length(pm)
+          pm(i) = sscanf(lab.value{i},'%d');
+        end
+        fprintf('    - OK, %d pitch marks\n',length(pm));
       catch ME
-        msg = sprintf('Cannot read label file "%s". Reason: %s',fn,ME.message);
+        msg = sprintf('Cannot annotation file "%s". Reason: %s',fn,ME.message);
         fprintf('  - FAILED, reason: %s\n',ME.message);
       end
       
-      % TODO: Read props from par file!
+      % Read pitch mark file
+      if isempty(pm)
+        fn = vVZtools.getPmFn(rid);
+        fprintf('- Read pitch marks file "%s"\n',fn);
+        try
+          lab = vVZtools.timitread(fn,'PM');
+          pm  = lab.k_E;
+          fprintf('  - OK, %d pitch marks\n',length(pm));
+        catch ME
+          msg = sprintf('Cannot read label file "%s". Reason: %s',fn,ME.message);
+          fprintf('  - FAILED, reason: %s\n',ME.message);
+        end
+      end
+      
     end  
-    
+
     function [status,msg] = savePitchMarks(rid,pm)
 
       fprintf('vVZtools.savePitchMarks(rid="%s")\n',rid);
@@ -344,12 +483,39 @@ classdef vVZtools
         msg    = sprintf('Cannot write file "%s". Reason %s',fn,ME.message);
         fprintf('  - FAILED, reason: %s\n',ME.message);
       end
-      
+
     end
-    
+
+    function [status,msg] = saveAnnotations(rid,pm,props)
+      fprintf('vVZtools.saveAnnotations(rid="%s")\n',rid);
+      
+      % Prepare label table
+      pm    = sort(pm);
+      tier  = cell(length(pm),1);
+      value = cell(length(pm),1);
+      for i=1:length(pm)
+        tier{i}  = 'PM';
+        value{i} = sprintf('%d',pm(i));
+      end
+      lab = [ props; table(tier,value) ];
+      
+      % Write Partitur file
+      fn = vVZtools.getParFn(rid);
+      fprintf('- Write annotation file "%s"\n',fn);
+      try
+        vVZtools.parwrite(fn,lab);
+        status = 1;
+        msg    = 'ok';
+        fprintf('  - OK\n');
+      catch ME
+        status = 0;
+        msg    = sprintf('Cannot write file "%s". Reason %s',fn,ME.message);
+        fprintf('  - FAILED, reason: %s\n',ME.message);
+      end
+    end
   end
   
-  %% == Labeling ===============================================================
+  %% == Labeling and Pitch Marking =============================================
   methods(Static)
 
     function kf = seekClosest(wave,k,L,fnc,varargin)
@@ -416,14 +582,18 @@ classdef vVZtools
       tf = false;                                                               % Initialize return value
       K  = length(wave);                                                        % Length wave
       if k<l || k>=K-l; return; end                                             % k too close to ends -> return
-      i = k+1;                                                                  % One-based sample index
-      wl = wave(i-l:i-1);                                                       % L samples left of k
-      wr = wave(i:i+l);                                                         % L samples right of k
-      if ~all(wl> 0); return; end                                               % non-positive left samples -> return
-      if ~all(wr<=0); return; end                                               % positive right samples -> return
-      if max(wl)< t ; return; end                                               % threshold missed left -> return
-      if min(wr)>-t ; return; end                                               % threshold missed right -> return
-      tf = true;                                                                % Yup - there's a zero cr. at k
+      n = k+1;                                                                  % One-based sample index
+      lok = false;                                                              % Left-samples-ok-flag
+      for i=1:l                                                                 % Seek l samples to the left >>
+        if wave(n-i)< 0; lok = false; break; end                                %   Negative -> definitely not ok
+        if wave(n-i)>=t; lok = true;  break; end                                %   Reached threshold -> definitely ok
+      end                                                                       % <<
+      rok = false;                                                              % Right-samples-ok-flag
+      for i=1:l                                                                 % Seek l samples to the right >>
+        if wave(n+i)>  0; rok = false; break; end                               %   Positive -> definitely not ok
+        if wave(n+i)<=-t; rok = true;  break; end                               %   Reached threshold -> definitely ok
+      end                                                                       % <<
+      tf = (lok && rok);                                                        % Yup - there's a zero cr. at k
     end
     
     function tf = zeroCrossingR(wave,k,l,t)
@@ -451,14 +621,18 @@ classdef vVZtools
       tf = false;                                                               % Initialize return value
       K  = length(wave);                                                        % Length wave
       if k<l || k>=K-l; return; end                                             % k too close to ends -> return
-      i = k+1;                                                                  % One-based sample index
-      wl = wave(i-l:i-1);                                                       % L samples left of k
-      wr = wave(i:i+l);                                                         % L samples right of k
-      if ~all(wl< 0); return; end                                               % non-negtive left samples -> return
-      if ~all(wr>=0); return; end                                               % negative right samples -> return
-      if min(wl)>-t ; return; end                                               % threshold missed left -> return
-      if max(wr)< t ; return; end                                               % threshold missed right -> return
-      tf = true;                                                                % Yup - there's a zero cr. at k
+      n = k+1;                                                                  % One-based sample index
+      lok = false;                                                              % Left-samples-ok-flag
+      for i=1:l                                                                 % Seek l samples to the left >>
+        if wave(n-i)>  0; lok = false; break; end                               %   Positive -> definitely not ok
+        if wave(n-i)<=-t; lok = true;  break; end                               %   Reached threshold -> definitely ok
+      end                                                                       % <<
+      rok = false;                                                              % Right-samples-ok-flag
+      for i=1:l                                                                 % Seek l samples to the right >>
+        if wave(n+i)< 0; rok = false; break; end                                %   Negative -> definitely not ok
+        if wave(n+i)>=t; rok = true;  break; end                                %   Reached threshold -> definitely ok
+      end                                                                       % <<
+      tf = (lok && rok);                                                        % Yup - there's a zero cr. at k
     end
 
     function [pm,K0m] = autoPitchMark(wave,k0,K0,l,t)
