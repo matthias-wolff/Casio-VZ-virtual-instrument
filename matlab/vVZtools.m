@@ -1,9 +1,13 @@
 classdef vVZtools
   % Library of static methods.
 
-  %properties(Constant)
-  %end
-
+  properties(Constant)
+    
+    dirWav = '../waves/';
+    dirLab = '../labels/';
+    
+  end
+  
   %% == Pitch <-> Frequency Converters =========================================
   methods(Static)
 
@@ -169,7 +173,7 @@ classdef vVZtools
       %
       % See also getPmFn
 
-      fn = ['../waves/' rid '.wav'];
+      fn = [vVZtools.dirWav rid '.wav'];
       fn = strrep(fn,'\','/');
     end
 
@@ -186,7 +190,7 @@ classdef vVZtools
       %
       % See also getWaveFn
       
-      fn = ['../labels/' rid '.pm'];
+      fn = [vVZtools.dirLab rid '.pm'];
       fn = strrep(fn,'\','/');
     end
 
@@ -203,7 +207,7 @@ classdef vVZtools
       %
       % See also getWaveFn
       
-      fn = ['../labels/' rid '.par'];
+      fn = [vVZtools.dirLab rid '.par'];
       fn = strrep(fn,'\','/');
     end
     
@@ -381,6 +385,61 @@ classdef vVZtools
       fclose(fid);      
     end
     
+    function val = parseKeyVal(keyVal,key,fmt)
+      % Returns a value from a list of key=value pairs.
+      %
+      %   val = vVZtools.parseKeyVal(keyVal,key,fmt)
+      %
+      % arguments:
+      %   keyVal - A cell vector of "key = value" strings
+      %   key    - Key to search for
+      %   fmt    - Format string of value, e.g., '%d'
+      %
+      % returns
+      %   val    - The value or an empty array if the key is not found or the
+      %            value could not be parsed
+      
+      val = [];
+      for i=1:length(keyVal)
+        kv = strsplit(keyVal{i},'=');
+        if strcmp(strtrim(kv{1}),key)
+          val = sscanf(strtrim(kv{2}),fmt,1);
+          return
+        end
+      end
+    end
+    
+    function rlst = listRecordings(filter)
+      % List vVZ test recordings.
+      %
+      %   rlst = vVZtools.listRecordings()
+      %   rlst = vVZtools.listRecordings(filter)
+      %
+      % arguments:
+      %   filter - A regular expression to filter for
+      %
+      % returns:
+      %   rlst   - A vector of recording IDs. A recording ID is a relative file
+      %            name excluding the extension.
+      %
+      % See also regexp, loadRecording, saveAnnotations
+      
+      l = dir(vVZtools.dirWav);
+      dirWav = l(1).folder;
+      l = dir([dirWav '/**/*.wav']);
+      rlst = cell(0);
+      if nargin==0; filter = '.*'; end
+      for i=1:length(l)
+        rec = strrep(l(i).folder,dirWav,'');
+        rec = strrep(rec,'\','/');
+        rec = [ rec(2:length(rec)) '/' strrep(l(i).name,'.wav','')];
+        if ~isempty(regexp(rec,filter,'ONCE'))
+          rlst{length(rlst)+1,1} = rec;
+        end
+      end
+      rlst = sort(rlst);
+    end
+    
     function [wave,pm,props,msg] = loadRecording(rid)
       % Loads a vVZ rescording.
       %
@@ -397,7 +456,7 @@ classdef vVZtools
       %   props - RESERVED
       %   msg   - Message
       %
-      % See also getWavFn, getPmFn
+      % See also getWaveFn, getParFn
       
       fprintf('vVZtools.loadRecording(rid="%s")\n',rid);
       wave  = [];
@@ -513,6 +572,40 @@ classdef vVZtools
         fprintf('  - FAILED, reason: %s\n',ME.message);
       end
     end
+    
+    function cycle = cutNiceCycle(wave,pm,FL,K0)
+      % Cuts a cycle with a specified length out of a wave.
+      %
+      %   cycle = vVZtools.cutNiceCycle(wave,pm,FL,K0)
+      %
+      % arguments:
+      %   wave  - The wave, a vector of samples
+      %   pm    - Pitch marks, a vector of zero-based sample indexes
+      %   FL    - A vector containing the one-based index of first and the last
+      %           pitch mark to consider for cutting.
+      %   K0    - The cycle length in samples
+      %
+      % returns:
+      %   cycle - The best wave cycle found in the search range, i.e., the cycle
+      %           whose length is closest to K0
+      
+      pm0 = FL(1); if pm0<=1; pm0 = 1; end
+      pm1 = FL(2); if pm1>=length(pm); pm1 = length(pm)-1; end
+      
+      iBest = -1;
+      KBest = length(wave);
+      for i=pm0:pm1
+        K = pm(i+1)-pm(i);
+        if abs(K0-K) < abs(K0-KBest)
+          iBest = i;
+          KBest = K;
+        end
+      end
+      
+      cycle = wave(pm(iBest)+1:pm(iBest+1));
+      
+    end
+    
   end
   
   %% == Labeling and Pitch Marking =============================================
