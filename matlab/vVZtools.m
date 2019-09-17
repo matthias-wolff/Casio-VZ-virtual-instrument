@@ -573,7 +573,7 @@ classdef vVZtools
       end
     end
     
-    function cycle = cutNiceCycle(wave,pm,FL,K0)
+    function [cycle,k0] = cutNiceCycle(wave,pm,FL,K0)
       % Cuts a cycle with a specified length out of a wave.
       %
       %   cycle = vVZtools.cutNiceCycle(wave,pm,FL,K0)
@@ -588,6 +588,7 @@ classdef vVZtools
       % returns:
       %   cycle - The best wave cycle found in the search range, i.e., the cycle
       %           whose length is closest to K0
+      %   k0    - The zero-based index of the first sample of the cycle
       
       pm0 = FL(1); if pm0<=1; pm0 = 1; end
       pm1 = FL(2); if pm1>=length(pm); pm1 = length(pm)-1; end
@@ -603,6 +604,7 @@ classdef vVZtools
       end
       
       cycle = wave(pm(iBest)+1:pm(iBest+1));
+      k0    = pm(iBest);
       
     end
     
