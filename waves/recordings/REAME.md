@@ -78,8 +78,6 @@ The cut waveforms are placed in folder `<vVZ>/waves/wavetable/sampled` by
 
 **TODO:** 
 1. The procedure does not work for the `NOISEn` waveforms. Improve!
-2. Automating the cutter to seek for zero-crossings and cycles of 1024 
-   samples would be nice...
 
 --------------------------------------------------------------------------------
 <span style="font-size:6pt">

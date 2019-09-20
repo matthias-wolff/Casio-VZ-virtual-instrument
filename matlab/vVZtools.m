@@ -856,5 +856,66 @@ classdef vVZtools
     
   end
   
+  %% == Plotting ===============================================================
+  methods(Static)
+
+    function plotPmInvert(y,x1,ft,yl,a)
+      K = length(y);
+      k = 0:K-1;
+      figure;
+      yyaxis right;
+      plot(k,y ,'-','LineWidth',2,'Color','red'); hold on;
+      title(ft);
+      xlim([0 K]);
+      set(gca,'XTick',0:K/4:K);
+      set(gca,'XTickLabel',{'0','0.25','0.5','0.75','1'});
+      xlabel('$$\frac{\varphi}{2\pi}$$','Interpreter','latex');
+      ylabel("$$\frac{y(\varphi)}{a}$$ ($$a\!=\!"+sprintf('%g',a)+"$$)",'Interpreter','latex');
+      yyaxis left;
+      ylabel('$$\frac{\varphi_{x1}(\varphi)}{2\pi}$$','Interpreter','latex');
+      ylim(yl);
+      scatter(x1(1,:),x1(2,:),2,'filled','MarkerFaceColor','blue');
+      hold off;
+    end
+
+    function plotPmModelPhase(phix1_mea,phix1_mod,ft,yl,mX,mY)
+      figure;
+      K = length(phix1_mod);
+      scatter(phix1_mea(1,:),phix1_mea(2,:),2,'filled','MarkerFaceColor',[0.85 0.85 1]);
+      ylim(yl);
+      xlim([0 K]);
+      set(gca,'XTick',0:K/4:K);
+      set(gca,'XTickLabel',{'0','0.25','0.5','0.75','1'});
+      xlabel('$$\frac{\varphi}{2\pi}$$','Interpreter','latex');
+      ylabel('$$\frac{\varphi_{x1}(\varphi)}{2\pi}$$','Interpreter','latex');
+      title(ft);
+      hold on;
+      k = 0:K-1;
+      plot(k,phix1_mod,'blue','LineWidth',2);
+      scatter(mX,mY,100,'+','red');
+      scatter(mX,mY,100,'o','red');
+      hold off;
+    end
+ 
+    function plotPmModelSignal(y_mea,y_mod,ft)
+      K = length(y_mea);
+      k = 0:K-1;
+      figure;
+      yyaxis left;
+      plot(k,y_mea,'LineWidth',2,'Color','blue');
+      hold on;
+      ylabel('$$y_{REC}(\varphi)$$','Interpreter','latex');
+      yyaxis right;
+      plot(k,y_mod,'LineWidth',2,'Color','red');
+      ylabel("$$y_{MODEL}(\varphi)$$",'Interpreter','latex');
+      title(ft);
+      xlim([0,K]);
+      set(gca,'XTick',0:K/4:K);
+      set(gca,'XTickLabel',{'0','0.25','0.5','0.75','1'});
+      xlabel('$$\frac{\varphi}{2\pi}$$','Interpreter','latex');
+    end
+
+  end
+
 end
 % EOF
