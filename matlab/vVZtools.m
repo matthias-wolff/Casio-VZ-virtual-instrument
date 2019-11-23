@@ -1,4 +1,4 @@
-classdef vVZtools
+ classdef vVZtools
   % Library of static methods.
 
   properties(Constant)
@@ -153,6 +153,70 @@ classdef vVZtools
         end                                                                     %   <<
       end                                                                       % <<
       x1 = x1(:,1:x1p-1);                                                       % Truncate output
+    end
+
+    function theta = pdmA2theta(a) 
+      % Converts the slope paramter of phase distortion modulation to the angle 
+      % parameter.
+      %
+      %   theta = vVZtools.pdmA2theta(a)
+      %
+      % arguments:
+      %   a     - The slope parameter
+      %
+      % returns: 
+      %   theta - The angle parameter
+      %
+      % See also pdmTheta2a
+
+      theta = (pi-atan(a)+atan(a./(2*a-1)))/pi*180;
+    end
+    
+    function a = theta2a(theta)
+      % Converts the angle paramter of phase distortion modulation to the slope 
+      % parameter.
+      %
+      %   a = vVZtools.theta2a(theta)
+      %
+      % arguments:
+      %   theta - The angle parameter
+      %
+      % returns: 
+      %   a     - The slope parameter
+      %
+      % See also pdmA2theta
+
+      a = theta;
+      syms aparam real;
+      assume(aparam>=1);
+      for i=1:length(theta)
+        t = theta(i)/180*pi;
+        S = solve(t==pi-atan(aparam)+atan(aparam/(2*aparam-1)),aparam);
+        a(i) = eval(S);
+      end
+    end
+    
+    function phipd = PDMcc(phi,a)
+      % Caracteristic Curve of phase distorion modulation.
+      %
+      %   phipd = vVZtools.PDMcc(phi,a)
+      %
+      % arguments:
+      %   phi   - An array of phase angles in the range [0,2*pi]
+      %   a     - The PDM slope parameter
+      %
+      % returns:
+      %   phipd - An array of PDM-modulated phase angles
+
+      assert(all(phi>=0) && all(phi<=2*pi));
+      phiB = pi./a;
+      phipd = (phi<=phiB).*a.*phi + (phi>phiB).*(a.*phi+2*pi*(a-1))/(2*a-1);
+    end
+    
+    function phipd = PDMccVZ(phi,a,phi0)
+      assert(all(phi>=0) && all(phi<=2*pi));
+      phiB = (pi-phi0)./a;
+      phipd = (phi<=phiB).*a.*phi + (phi>phiB).*(a.*(phi0+pi).*phi-2*pi*(phi0-pi)*(a-1))/(phi0-pi+2*pi*a);
     end
     
   end
@@ -866,7 +930,7 @@ classdef vVZtools
       yyaxis right;
       plot(k,y ,'-','LineWidth',2,'Color','red'); hold on;
       title(ft);
-      xlim([0 K]);
+      xlim([0 K])
       set(gca,'XTick',0:K/4:K);
       set(gca,'XTickLabel',{'0','0.25','0.5','0.75','1'});
       xlabel('$$\frac{\varphi}{2\pi}$$','Interpreter','latex');
