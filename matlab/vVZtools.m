@@ -93,7 +93,7 @@
   methods(Static)
   
     function x1 = pmInvert(y,x2,C)
-      % Inverts the phase modulation y(k) = x2(k + K*x1(k)).
+      % Inverts the phase modulation y(k) = x2(k + K*x1(k)) with 0<=k<K.
       %
       %   x1 = vVZtools.pmInvert(y,x2)
       %   x1 = vVZtools.pmInvert(y,x2,C)
@@ -537,6 +537,7 @@
       catch ME
         msg = sprintf('Cannot read wave file "%s". Reason: %s',fn,ME.message);
         fprintf('  - FAILED, reason: %s\n',ME.message);
+        fprintf('    Try to change to directory vVZ/matlab!\n');
         return;
       end
 
@@ -936,7 +937,7 @@
       xlabel('$$\frac{\varphi}{2\pi}$$','Interpreter','latex');
       ylabel("$$\frac{y(\varphi)}{a}$$ ($$a\!=\!"+sprintf('%g',a)+"$$)",'Interpreter','latex');
       yyaxis left;
-      ylabel('$$\frac{\varphi_{x1}(\varphi)}{2\pi}$$','Interpreter','latex');
+      ylabel('$$x_1(\varphi)$$','Interpreter','latex');
       ylim(yl);
       scatter(x1(1,:),x1(2,:),2,'filled','MarkerFaceColor','blue');
       hold off;
